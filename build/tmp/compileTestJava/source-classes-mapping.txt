@@ -1,0 +1,4 @@
+am/aca/generactive/database/DatabaseConnectionTest.java
+ am.aca.generactive.database.DatabaseConnectionTest
+am/aca/generactive/repository/ItemJdbcRepositoryTest.java
+ am.aca.generactive.repository.ItemJdbcRepositoryTest

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="am.aca.generactive.repository.ItemJdbcRepositoryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-09-08T14:55:47" hostname="Andraniks-MacBook-Pro.local" time="0.026">
+  <properties/>
+  <testcase name="Insert" classname="am.aca.generactive.repository.ItemJdbcRepositoryTest" time="0.026"/>
+  <system-out><![CDATA[insert into item(name, base_price) values('TestItem','100')
+insert into item(name, base_price) values('TestItem','100')
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
