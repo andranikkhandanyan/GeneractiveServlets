@@ -2,7 +2,6 @@ package am.aca.generactive.servlets;
 
 import am.aca.generactive.model.GenerativeItem;
 import am.aca.generactive.model.Item;
-import am.aca.generactive.model.StockItem;
 import am.aca.generactive.repository.ItemRepository;
 import am.aca.generactive.servlets.enums.ItemType;
 import am.aca.generactive.util.URLUtils;
@@ -24,7 +23,7 @@ public class ItemServlet extends HttpServlet {
 
     public static final String PARAM_TYPE = "type";
 
-    private final ItemRepository itemRepository = ItemRepository.getInstance();
+    private final ItemRepository itemRepository = new ItemRepository();
 
     /**
      * Receive {@link Item} object in JSON format String.
@@ -57,7 +56,8 @@ public class ItemServlet extends HttpServlet {
                 item = objectMapper.readValue(payload, GenerativeItem.class);
                 break;
             case STOCK:
-                item = objectMapper.readValue(payload, StockItem.class);
+                // FIXME
+                item = objectMapper.readValue(payload, Item.class);
                 break;
             default:
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -69,7 +69,7 @@ public class ItemServlet extends HttpServlet {
         if (itemId == null) return;
 
         item.setId(itemId);
-        if (itemRepository.updateItem(item) == 0) {
+        if (itemRepository.update(item) == null) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write("Resource not found: " + itemId);
         }
@@ -85,7 +85,7 @@ public class ItemServlet extends HttpServlet {
         Integer itemId = URLUtils.getLastPathSegment(req, resp);
         if (itemId == null) return;
 
-        Optional<Item> itemOpt = itemRepository.findItemById(itemId);
+        Optional<Item> itemOpt = itemRepository.findById(itemId);
         if (itemOpt.isPresent()) {
             ObjectMapper objectMapper = new ObjectMapper();
             resp.getWriter().write(objectMapper.writeValueAsString(itemOpt.get()));

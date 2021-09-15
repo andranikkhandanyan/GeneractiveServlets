@@ -22,7 +22,7 @@ public class ItemsSearchServlet extends HttpServlet {
     public static final String PARAM_PRICE_GT = "priceGT";
     public static final String PARAM_PRICE_LT = "priceLT";
 
-    private final ItemRepository itemRepository = ItemRepository.getInstance();
+    private final ItemRepository itemRepository = new ItemRepository();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

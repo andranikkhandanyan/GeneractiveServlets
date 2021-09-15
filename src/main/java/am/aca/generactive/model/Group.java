@@ -1,26 +1,54 @@
 package am.aca.generactive.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "\"group\"") // table name is "group" for PostgreSQL
 public class Group {
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "group_id_seq")
+    @SequenceGenerator(name = "group_id_seq", sequenceName = "group_id_seq", allocationSize = 1)
+    private Long id;
+
+    @Column(name = "name")
     private String name;
+
+    @OneToMany(mappedBy = "group")
+    @JsonIgnore
+    private List<Item> items = new ArrayList<>();
+
+    @Transient
     private Group parentGroup;
+
+    @Transient
     private final List<Group> subGroups = new ArrayList<>();
-    private final List<Item> items = new ArrayList<>();
+
+    public Group() {
+    }
 
     public Group(long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public long getId() {
-        return this.id;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Group getParentGroup() {
@@ -29,6 +57,10 @@ public class Group {
 
     public List<Item> getItems() {
         return new ArrayList<>(items);
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
     }
 
     void setParentGroup(Group parentGroup) {

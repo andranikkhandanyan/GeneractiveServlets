@@ -1,55 +1,37 @@
 package am.aca.generactive.repository;
 
 import am.aca.generactive.model.Group;
+import am.aca.generactive.orm.HibernateConfiguration;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 public class GroupRepository {
 
-    private static GroupRepository sInstance;
+    public static final HibernateConfiguration HIBERNATE_CONFIGURATION =
+            HibernateConfiguration.getInstance();
 
-    private final List<Group> groups = new ArrayList<>();
+    public Optional<Group> getGroup(long groupId) {
+        Session session = HIBERNATE_CONFIGURATION.getSession();
+        Transaction transaction = session.beginTransaction();
 
-    public static GroupRepository getInstance() {
-        if (sInstance == null) {
-            sInstance = new GroupRepository();
-        }
+        // Hibernate query to get group by id
+        // equivalent sql query: select * from group where id = ?;
+        // equivalent JPQL query: select i from Group i where id = :id;
+        // Group is the name of the Entity defined by @Entity annotation
+        Query<Group> query = session.createQuery(
+                "select g from Group g" +
+                        " where g.id = :id ",
+                Group.class);
+        query.setParameter("id", groupId);
+        // Execute the query and get single result
+        Group group = query.getSingleResult();
 
-        return sInstance;
-    }
+        transaction.commit();
+        session.close();
 
-    public void addGroup(Group group) {
-        this.groups.add(group);
-    }
-
-    public void addGroupAll(List<Group> groups) {
-        this.groups.addAll(groups);
-    }
-
-    public Group findGroupById(int groupId) {
-        for (Group group: groups) {
-            if (group.getId() == groupId) {
-                return group;
-            }
-        }
-
-        return null;
-    }
-
-    public List<Group> getGroupsHierarchy() {
-        List<Group> rootGroups = new ArrayList<>();
-
-        for (Group group: groups) {
-            if (group.getParentGroup() == null) {
-                rootGroups.add(group);
-            }
-        }
-
-        return rootGroups;
-    }
-
-    private GroupRepository() {
-
+        return Optional.ofNullable(group);
     }
 }

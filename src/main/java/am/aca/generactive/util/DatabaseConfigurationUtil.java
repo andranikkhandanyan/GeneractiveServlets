@@ -6,16 +6,20 @@ import java.util.Properties;
 
 public class DatabaseConfigurationUtil {
 
-    public static final String DATABASE_PROPERTIES_FILE = "database.properties";
+    public static final String DATABASE_PROPERTIES_FILE = "hibernate.properties";
 
     /**
-     * Loads properties from {@code database.properties} file.
-     * Each module should provide its {@code database.properties} file with database configuration.
+     * Loads properties from {@code hibernate.properties} file.
+     * Each module should provide its {@code hibernate.properties} file with database configuration.
      * {@code DatabaseConfigurationUtil.class.getClassLoader().getResource()} will load file
      * from concrete module resources.
-     * @return {@link Properties} instance with keys/values from the {@code database.properties} file.
+     * @return {@link Properties} instance with keys/values from the {@code hibernate.properties} file.
      */
     public static Properties getConnectionProperties() {
+        return readProperties(DATABASE_PROPERTIES_FILE);
+    }
+
+    public static Properties readProperties(String file) {
         // Create Properties object.
         Properties props = new Properties();
 
@@ -23,13 +27,13 @@ public class DatabaseConfigurationUtil {
             // Load jdbc related properties in above file.
             props.load(Objects.requireNonNull(DatabaseConfigurationUtil.class
                     .getClassLoader()
-                    .getResource(DATABASE_PROPERTIES_FILE)).openStream());
+                    .getResource(file)).openStream());
 
             return props;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Unable to load db properties from: "
-                    + DATABASE_PROPERTIES_FILE);
+                    + file);
         }
     }
 }

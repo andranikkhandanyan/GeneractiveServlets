@@ -2,8 +2,6 @@ package am.aca.generactive.servlets;
 
 import am.aca.generactive.model.GenerativeItem;
 import am.aca.generactive.model.Item;
-import am.aca.generactive.model.StockItem;
-import am.aca.generactive.repository.ItemJdbcRepository;
 import am.aca.generactive.repository.ItemRepository;
 import am.aca.generactive.servlets.enums.ItemType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,8 +20,7 @@ public class ItemsServlet extends HttpServlet {
 
     public static final String PARAM_TYPE = "type";
 
-    private final ItemRepository itemRepository = ItemRepository.getInstance();
-    private final ItemJdbcRepository itemJdbcRepository = new ItemJdbcRepository();
+    private final ItemRepository itemRepository = new ItemRepository();
 
     /**
      * Receive {@link Item} object in JSON format String.
@@ -55,7 +52,8 @@ public class ItemsServlet extends HttpServlet {
                 item = objectMapper.readValue(payload, GenerativeItem.class);
                 break;
             case STOCK:
-                item = objectMapper.readValue(payload, StockItem.class);
+                // FIXME
+                item = objectMapper.readValue(payload, Item.class);
                 break;
             default:
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -63,10 +61,7 @@ public class ItemsServlet extends HttpServlet {
                 return;
         }
 
-        // item.setId(IdGenerator.getNext(Type.ITEM));
-        // itemRepository.addItem(item);
-        long id = itemJdbcRepository.insert(item);
-        item.setId(id);
+        itemRepository.insert(item);
 
         resp.getWriter().write(objectMapper.writeValueAsString(item));
     }
@@ -78,6 +73,6 @@ public class ItemsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType(CONTENT_TYPE_JSON);
         ObjectMapper objectMapper = new ObjectMapper();
-            resp.getWriter().write(objectMapper.writeValueAsString(itemJdbcRepository.getAllItems()));
+            resp.getWriter().write(objectMapper.writeValueAsString(itemRepository.getAllItems()));
     }
 }
