@@ -1,2 +1,0 @@
-<insert into item(name, base_price) values('TestItem','100')
-<insert into item(name, base_price) values('TestItem','100')
