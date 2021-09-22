@@ -17,11 +17,11 @@ public final class URLUtils {
         return url.substring(url.lastIndexOf("/") + 1);
     }
 
-    public static Integer getLastPathSegment(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public static Long getLastPathSegment(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String lastPathSegment = getPathLastSegment(req.getRequestURI());
-        int itemId;
+        long itemId;
         try {
-            itemId = Integer.parseInt(lastPathSegment);
+            itemId = Long.parseLong(lastPathSegment);
         } catch (NumberFormatException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("Expected int: " + lastPathSegment);

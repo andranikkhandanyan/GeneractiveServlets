@@ -1,7 +1,8 @@
 package am.aca.generactive.servlets;
 
+import am.aca.generactive.config.ApplicationContainer;
 import am.aca.generactive.model.Item;
-import am.aca.generactive.repository.ItemRepository;
+import am.aca.generactive.service.ItemService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -22,7 +23,8 @@ public class ItemsSearchServlet extends HttpServlet {
     public static final String PARAM_PRICE_GT = "priceGT";
     public static final String PARAM_PRICE_LT = "priceLT";
 
-    private final ItemRepository itemRepository = new ItemRepository();
+    private final ItemService itemService = ApplicationContainer
+            .context.getBean(ItemService.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -39,7 +41,8 @@ public class ItemsSearchServlet extends HttpServlet {
             }
         }
 
-        List<Item> rv = itemRepository.findItems(searchPredicate);
+        // FIXME
+        List<? extends Item> rv = itemService.getAll();
 
         ObjectMapper objectMapper = new ObjectMapper();
         resp.getWriter().write(objectMapper.writeValueAsString(rv));

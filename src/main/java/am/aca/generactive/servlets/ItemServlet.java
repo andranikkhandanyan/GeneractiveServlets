@@ -1,8 +1,10 @@
 package am.aca.generactive.servlets;
 
+import am.aca.generactive.config.ApplicationContainer;
 import am.aca.generactive.model.GenerativeItem;
 import am.aca.generactive.model.Item;
-import am.aca.generactive.repository.ItemRepository;
+import am.aca.generactive.repository.ItemRepositoryImpl;
+import am.aca.generactive.service.ItemService;
 import am.aca.generactive.servlets.enums.ItemType;
 import am.aca.generactive.util.URLUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +25,8 @@ public class ItemServlet extends HttpServlet {
 
     public static final String PARAM_TYPE = "type";
 
-    private final ItemRepository itemRepository = new ItemRepository();
+    private final ItemService itemService = ApplicationContainer
+            .context.getBean(ItemService.class);
 
     /**
      * Receive {@link Item} object in JSON format String.
@@ -33,7 +36,7 @@ public class ItemServlet extends HttpServlet {
      * param(s), wrong {@link ItemType} string representation,
      * code {@code 404} if item not found.
      *
-     * Updated Item will be updated in {@link ItemRepository}
+     * Updated Item will be updated in {@link ItemRepositoryImpl}
      */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -65,11 +68,11 @@ public class ItemServlet extends HttpServlet {
                 return;
         }
 
-        Integer itemId = URLUtils.getLastPathSegment(req, resp);
+        Long itemId = URLUtils.getLastPathSegment(req, resp);
         if (itemId == null) return;
 
         item.setId(itemId);
-        if (itemRepository.update(item) == null) {
+        if (itemService.update(item) == null) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write("Resource not found: " + itemId);
         }
@@ -82,10 +85,10 @@ public class ItemServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Integer itemId = URLUtils.getLastPathSegment(req, resp);
+        Long itemId = URLUtils.getLastPathSegment(req, resp);
         if (itemId == null) return;
 
-        Optional<Item> itemOpt = itemRepository.findById(itemId);
+        Optional<Item> itemOpt = itemService.getItem(itemId);
         if (itemOpt.isPresent()) {
             ObjectMapper objectMapper = new ObjectMapper();
             resp.getWriter().write(objectMapper.writeValueAsString(itemOpt.get()));
@@ -97,10 +100,10 @@ public class ItemServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Integer itemId = URLUtils.getLastPathSegment(req, resp);
+        Long itemId = URLUtils.getLastPathSegment(req, resp);
         if (itemId == null) return;
 
-        if (!itemRepository.deleteById(itemId)) {
+        if (!itemService.delete(itemId)) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write("Resource not found: " + itemId);
         }

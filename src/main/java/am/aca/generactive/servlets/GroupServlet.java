@@ -1,7 +1,9 @@
 package am.aca.generactive.servlets;
 
+import am.aca.generactive.config.ApplicationContainer;
 import am.aca.generactive.model.Group;
 import am.aca.generactive.repository.GroupRepository;
+import am.aca.generactive.repository.ItemRepositoryImpl;
 import am.aca.generactive.util.URLUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,7 +19,8 @@ import static am.aca.generactive.servlets.HttpConstants.CONTENT_TYPE_JSON;
 @WebServlet(name = "GroupServlet", urlPatterns = "/group/*")
 public class GroupServlet extends HttpServlet {
 
-    private final GroupRepository groupRepository = new GroupRepository();
+    private final GroupRepository groupRepository = ApplicationContainer
+            .context.getBean(GroupRepository.class);
 
     /**
      * Get all groups
@@ -25,7 +28,7 @@ public class GroupServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType(CONTENT_TYPE_JSON);
-        Integer groupId = URLUtils.getLastPathSegment(req, resp);
+        Long groupId = URLUtils.getLastPathSegment(req, resp);
         if (groupId == null) return;
 
         Optional<Group> groupOpt = groupRepository.getGroup(groupId);

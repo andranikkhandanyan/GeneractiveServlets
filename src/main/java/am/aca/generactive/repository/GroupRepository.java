@@ -1,20 +1,25 @@
 package am.aca.generactive.repository;
 
 import am.aca.generactive.model.Group;
-import am.aca.generactive.orm.HibernateConfiguration;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Component
 public class GroupRepository {
 
-    public static final HibernateConfiguration HIBERNATE_CONFIGURATION =
-            HibernateConfiguration.getInstance();
+    private final SessionFactory sessionFactory;
+
+    public GroupRepository(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     public Optional<Group> getGroup(long groupId) {
-        Session session = HIBERNATE_CONFIGURATION.getSession();
+        Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
 
         // Hibernate query to get group by id
