@@ -90,18 +90,18 @@ public class Group {
     }
 
     private void printSubGroups(int level) {
-        String subLevelPrefix = "  ".repeat(level);
-        for (Group group : subGroups) {
-            System.out.print(subLevelPrefix);
-            group.print(level);
-        }
+//        String subLevelPrefix = "  ".repeat(level);
+//        for (Group group : subGroups) {
+//            System.out.print(subLevelPrefix);
+//            group.print(level);
+//        }
     }
 
     private void printItems(int level) {
-        String subLevelPrefix = "  ".repeat(level);
-        for (Item item : items) {
-            System.out.print(subLevelPrefix);
-            item.print();
-        }
+//        String subLevelPrefix = "  ".repeat(level);
+//        for (Item item : items) {
+//            System.out.print(subLevelPrefix);
+//            item.print();
+//        }
     }
 }

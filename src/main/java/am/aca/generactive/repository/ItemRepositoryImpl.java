@@ -1,123 +1,78 @@
 package am.aca.generactive.repository;
 
-import am.aca.generactive.config.ApplicationContainer;
 import am.aca.generactive.model.Group;
 import am.aca.generactive.model.Item;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-@Component
-public class ItemRepositoryImpl implements ItemRepository {
+public class ItemRepositoryImpl {
 
-    private SessionFactory sessionFactory;
-
-    public ItemRepositoryImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public void attachItemToGroup(long itemId, long groupId) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction transaction = session.beginTransaction();
-
-        Item item = session.get(Item.class, itemId);
-        Group group = session.get(Group.class, groupId);
+        Item item = entityManager.find(Item.class, itemId);
+        Group group = entityManager.find(Group.class, groupId);
 
         item.setName("Manually updated");
 
         group.addItem(item);
-
-        transaction.commit();
-        session.close();
     }
 
-    @Override
+    
     public Item insert(Item item) {
-        Session session = sessionFactory.getCurrentSession();
-//        Transaction transaction = session.beginTransaction();
-
         if (item.getItemDetail() != null) {
             item.getItemDetail().setItem(item);
         }
-        session.save(item);
 
-//        transaction.commit();
-
-//        session.close();
+        entityManager.persist(item);
 
         return item;
     }
 
-    @Override
+    
     public Item update(Item item) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction transaction = session.beginTransaction();
-
-        Item existing = session.get(Item.class, item.getId());
+        Item existing = entityManager.find(Item.class, item.getId());
         existing.setName(item.getName());
         existing.setBasePrice(item.getBasePrice());
-
-        transaction.commit();
-
-        session.close();
 
         return existing;
     }
 
-    @Override
+    
     public Optional<Item> findById(Long id) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction transaction = session.beginTransaction();
-
         // Hibernate query to get item by id
         // equivalent sql query: select * from item where id = ?;
         // equivalent JPQL query: select i from Item i where id = :id;
         // Item is the name of the Entity defined by @Entity annotation
         // Query will be executed right at this point
-        Item item = session.get(Item.class, id);
-
-        transaction.commit();
-        session.close();
+        Item item = entityManager.find(Item.class, id);
 
         return Optional.ofNullable(item);
     }
 
-    @Override
+    
     public List<? extends Item> getAllItems() {
-        Session session = sessionFactory.getCurrentSession();
-
-        Transaction transaction = session.beginTransaction();
-
         // HQL query to get all the items
         // equivalent sql query: select * from item;
         // equivalent JPQL query: select i from Item i;
         // Item is the name of the Entity defined by @Entity annotation
-        String q = "from Item i";
+        String q = "from Item";
         // Create query (query will not be executed at this point)
-        Query<Item> query = session.createQuery(q, Item.class);
-        // Execute the query and get list of results
-        List<? extends Item> items = query.getResultList();
-
-        transaction.commit();
-        session.close();
+        List<? extends Item> items = entityManager.createQuery(q, Item.class)
+                .getResultList();
 
         return items;
     }
 
-    @Override
+    
     public boolean deleteById(Long id) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction transaction = session.beginTransaction();
-
         // HQL query to get all the items
         // equivalent sql query: delete from item where id = ?;
         // Item is the name of the Entity defined by @Entity annotation
@@ -125,27 +80,23 @@ public class ItemRepositoryImpl implements ItemRepository {
                 " where i.id = :id";
 
         // Create query (query will not be executed at this point)
-        Query query = session.createQuery(q);
-        // Set named parameter
-        query.setParameter("id", id);
-        // Execute the query
-        int deleted = query.executeUpdate();
-
-        transaction.commit();
-        session.close();
+        int deleted = entityManager.createQuery(q)
+                .setParameter("id", id) // Set named parameter
+                .executeUpdate(); // Execute the query
 
         return deleted != 0;
     }
 
-    @Override
+    
     public boolean delete(Item item) {
-        Session session = sessionFactory.getCurrentSession();
-
-        session.remove(item);
-
-        session.close();
+        entityManager.remove(item);
 
         return true;
+    }
+
+    
+    public List<Item> getEverything() {
+        return null;
     }
 
     public List<Item> findItems(Predicate<Item> searchPredicate) {

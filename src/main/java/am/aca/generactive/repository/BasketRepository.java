@@ -5,10 +5,16 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Optional;
 
 @Component
 public class BasketRepository {
+
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final SessionFactory sessionFactory;
 
@@ -17,13 +23,10 @@ public class BasketRepository {
     }
 
     public Optional<Basket> getBasket(Long basketId) {
-        Session session = sessionFactory.getCurrentSession();
-//        Transaction transaction = session.beginTransaction();
-
-        Basket basket = session.get(Basket.class, 1L);
-
-//        transaction.commit();
-//        session.close();
+        Basket basket = entityManager
+                .createQuery("select b from Basket b" +
+                        " where b.id = 1", Basket.class)
+                .getSingleResult();
 
         return Optional.ofNullable(basket);
     }
