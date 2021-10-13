@@ -16,7 +16,6 @@ public class ItemDTO {
     @Min(value = 10)
     @Max(value = 1000)
     private Integer basePrice;
-    @NotNull
     private ItemDetailsDTO itemDetails;
     private String groupName;
 

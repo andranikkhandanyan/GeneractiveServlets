@@ -45,7 +45,7 @@ public class ItemDTOMapper {
         }
 
         Item entity = new Item();
-        // entity.setId(dto.getId());
+        entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setBasePrice(dto.getBasePrice());
         entity.setItemDetail(ItemDetailsDTO.mapToEntity(dto.getItemDetails()));

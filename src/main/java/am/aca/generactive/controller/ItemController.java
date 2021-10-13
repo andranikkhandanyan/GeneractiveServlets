@@ -3,6 +3,8 @@ package am.aca.generactive.controller;
 import am.aca.generactive.service.ItemService;
 import am.aca.generactive.service.dto.ItemDTO;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +30,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
+    @PostAuthorize("hasAnyAuthority('ADMIN')")
     public List<? extends ItemDTO> search(@RequestParam String name) {
         return itemService.find(name);
     }
@@ -38,6 +41,7 @@ public class ItemController {
     }
 
     @PostMapping
+    @PostAuthorize("hasAnyAuthority('CREATE_ITEM')")
     public @ResponseBody ItemDTO create(@RequestBody @Valid ItemDTO itemDTO) {
         return itemService.create(itemDTO);
     }
